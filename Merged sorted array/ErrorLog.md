@@ -1,8 +1,8 @@
-# 📂 2. Name
+# 📂 2. Merge Sorted Array
 
 - **Difficulty:** Easy
 - **Tags:** Array, Two Pointers, Sorting
-- **Link:** [LeetCode Problem Link](https://...)
+- **Link:** [LeetCode Problem Link](https://leetcode.com/problems/merge-sorted-array/)
 
 ---
 
