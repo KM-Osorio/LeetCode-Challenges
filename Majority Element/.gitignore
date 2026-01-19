@@ -1,0 +1,10 @@
+# C++ compiled files
+*.out
+*.exe
+*.o
+*.obj
+
+# IDE specific files (si usas VS Code o CLion)
+.vscode/
+.idea/
+*.DS_Store
