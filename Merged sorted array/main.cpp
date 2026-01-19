@@ -1,5 +1,5 @@
 // Problem: Merge Sorted Array
-// Link: https://leetcode.com/problems/merge-sorted-array/description/
+// Link: https://leetcode.com/problems/merge-sorted-array/
 // Difficulty: Easy
 // Tags: Array, Pointers
 
