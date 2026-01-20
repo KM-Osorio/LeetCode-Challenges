@@ -48,4 +48,36 @@ public:
 };
 ```
 
+## 📊 Complexity Analysis
+
+- **Time Complexity:** $O(n)$
+  - Iterating the array to fill the map takes $O(n)$.
+  - std::max_element iterates over the map once, which is roughly $O(n)$ in the worst case (unique elements).
+- **Space Complexity:**  $O(n)$
+  - In the worst case, the map stores up to $n$ unique elements (or $n/2$ in the context of majority element).
+
+---
+## 🐛 Debugging & Error Log (Post-Mortem)
+
+| Error Type | Issue Description | Root Cause | Fix / Learning |
+| :--- | :--- | :--- | :--- |
+| **Optimization**  | Initial approach used two manual loops (one to fill, one to find max).| Unaware of STL power tools. | Replaced second loop with std::max_element + Lambda. |
+| **Compilation** | no matching function for call... inside the Lambda. | Map keys are immutable. I tried to pass pair<int, int>& (modifiable) but map stores pair<const int, int>. | Changed Lambda parameters to const pair<int, int>& a. |
+| **Logic** |Returned the wrong value (the count instead of the number). | Confusion between .first (Key/Number) and .second (Value/Frequency).| Always verify return type: it->first is the element, it->second is the count |
+---
+
+## 🧠 Technical Deep Dive: Hash Map Internals
+
+### Why must the pair be `const` in the Lambda?
+
+In a `std::unordered_map`, the internal data structure relies entirely on the **Key**.
+
+1.  **Hashing & Buckets:** The Key determines which "bucket" (memory slot) the data goes into based on its Hash value.
+2.  **Data Integrity:** If C++ allowed modification of the Key inside the map, the element's position would become invalid relative to its new hash. The element would be "lost" in the wrong bucket, effectively corrupting the map.
+
+Therefore, the type effectively stored inside a map is **strictly**:
+
+```cpp
+std::pair<const Key, Value>
+
 
