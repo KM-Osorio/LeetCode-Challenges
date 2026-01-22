@@ -1,44 +1,49 @@
-# 📂 2. Merge Sorted Array
+# 📂 121. Best Time to Buy and Sell Stock
 
 - **Difficulty:** Easy
-- **Tags:** Array, Two Pointers, Sorting
-- **Link:** [LeetCode Problem Link](https://leetcode.com/problems/merge-sorted-array/)
+- **Tags:** `Array` `Dynamic Programming` `Greedy`
+- **Link:** [LeetCode Problem Link](https://leetcode.com/problems/best-time-to-buy-and-sell-stock/)
 
 ---
 
 ## 💡 Solution Approach
 
-The problem asks us to merge two sorted arrays (`nums1` and `nums2`) into `nums1`, which has extra space at the end.
+The problem asks us to maximize profit by choosing a single day to buy and a different day in the future to sell.
 
-Instead of starting from the beginning (which would require shifting elements repeatedly), we use a **Reverse Two Pointers** approach:
+I used a **One Pass (Greedy)** approach. Instead of trying to predict the future or comparing every pair ($O(N^2)$), we iterate through the prices while keeping track of two variables:
+1.  `min_price`: The lowest price observed **so far**.
+2.  `max_profit`: The maximum profit calculated (`current_price - min_price`) encountered so far.
 
-1.  **Pointers:** Initialize three pointers:
-    -   `p1`: points to the last valid element in `nums1` ($m-1$).
-    -   `p2`: points to the last element in `nums2` ($n-1$).
-    -   `p`: points to the end of the total array ($m+n-1$), acting as the **write pointer**.
-2.  **Comparison:** Iterate backwards. Compare `nums1[p1]` and `nums2[p2]`. Place the larger element at `nums1[p]` and decrement the corresponding pointers.
-3.  **Cleanup:** If `nums2` still has elements left after `nums1` is exhausted, copy them into `nums1`. (If `nums1` has elements left, they are already in place).
+Logic:
+- If the current price is lower than our `min_price`, we update `min_price` (finding a new valley).
+- Else, if selling at the current price yields a better profit than `max_profit`, we update our record.
+
 ---
+
 ## 📊 Complexity Analysis
 
-- **Time Complexity:** $O(m + n)$
-  - We traverse each array (nums1 and nums2) exactly once linearly to merge them.
-- **Space Complexity:**  $O(1)$
-  - We do not use any extra data structures; the merging happens in-place within the allocated space of nums1.
+- **Time Complexity:** $O(N)$
+  - **Why:** We traverse the `prices` array exactly once, performing constant time operations ($O(1)$) at each step.
+- **Space Complexity:** $O(1)$
+  - **Why:** We only store two integer variables (`buy` and `profit`), regardless of the input size. No extra arrays or data structures are used.
 
 ---
+
 ## 🐛 Debugging & Error Log (Post-Mortem)
 
 | Error Type | Issue Description | Root Cause | Fix / Learning |
 | :--- | :--- | :--- | :--- |
-| **Logic / Indexing**  | Using nums1[m + ptr2] as the insertion index.| Conceptual Gap: Tied the "write" position to the ptr2 index. This failed because ptr2 only decrements when we pick from nums2, causing overwrites or gaps. | Decouple the reading and writing. Use a dedicated third pointer (p or i) solely for the writing position that decrements on every step. |
-| **Edge Case** | Logic for m=0 or n=0 handled manually/incorrectly. | Implementation Details: Trying to force specialized if statements instead of letting the main loop handle it. | The while(p2 >= 0) loop naturally handles the case where m=0. Specialized checks aren't needed if the loop logic is robust. |
-| **Completeness** | Numbers from nums2 were sometimes missing or "stuck". | Optimization Missing: The initial code didn't handle the case where nums1 is exhausted first (e.g., nums1=[7,8,9,0,0,0], nums2=[1,2,3]). | Added a cleanup while (p2 >= 0) loop to ensure all remaining elements from nums2 are copied over. |
+| **Logic Error** | Tried to find the global minimum first using `min_element` and then search for a selling point after it. | False assumption: The best buy time is always the absolute lowest price in the array (fails if the global min appears after the peak). | Switched to a **One Pass** dynamic approach where `min_price` is updated as we iterate. |
+| **Syntax / Safety** | Potential segmentation fault if `prices` array is empty. | Initializing `int buy = prices[0]` without checking `prices.size()`. | Added a guard clause: `if (prices.empty()) return 0;` at the start. |
+| **Clean Code** | Unused variable warning (`sell`). | Declared `int sell` but calculated profit directly in the loop condition. | Removed the `sell` variable to reduce memory usage and noise. |
+
 ---
 
-## 🧠 Technical Deep Dive: Reverse Filling Pattern
+## 🧠 Technical Deep Dive: Why Greedy works here?
 
-When you see a problem involving sorted arrays where one array has extra buffer space at the end, and you need to merge or manipulate them in-place.Why Reverse Filling Works:Standard merging (forward) requires shifting elements to the right to make space ($O(N^2)$ behavior or extra space). By filling from the back:
-1.  **Zero Collisions:** We write into the empty "buffer" zone ($0, 0, 0$) first.
-3.  **Preservation:** We never overwrite a number in nums1 until we have already processed/moved it.
-2.  **Stability:** It effectively mimics a merge sort merge step but utilizes the provided empty space as the target array.
+This problem is a classic example of a **Greedy Algorithm** that simulates a local decision-making process.
+
+Often, stock problems suggest Dynamic Programming. We could define `dp[i]` as the max profit selling on day `i`.
+$$dp[i] = prices[i] - \min(prices[0]...prices[i-1])$$
+
+However, notice that to solve `dp[i]`, we don't need the entire history of previous prices; we only need the **minimum** seen so far. By maintaining that state in a single variable (`buy` or `min_price`), we reduce the Space Complexity from $O(N)$ (if we stored a DP array) to $O(1)$. This optimization is critical in High-Frequency Trading (HFT) contexts where memory latency matters.
